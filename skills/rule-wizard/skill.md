@@ -1,7 +1,7 @@
 ---
 name: rule-wizard
-description: Kural eklemeden önce seçenekli soru-cevap turlarıyla netleştirme sihirbazı. Bağlamdan eksik detayları yakalar, alternatifleri seçenek olarak gösterir, dinamik çoklu kural algılar, sonunda netleşen kural(lar)ı /rule ile ekler.
-argument-hint: "<Türkçe bağlam — kuralın genel konusu>"
+description: "Kural eklemeden önce seçenekli soru-cevap turlarıyla netleştirme sihirbazı. Bağlamdan eksik detayları yakalar, alternatifleri seçenek olarak gösterir, dinamik çoklu kural algılar, sonunda netleşen kural(lar)ı /rule ile ekler. 3 kapsam: proje, --global, --team."
+argument-hint: "[--global|--team] <Türkçe bağlam — kuralın genel konusu>"
 ---
 
 # /rule-wizard Skill
@@ -82,15 +82,25 @@ Sonra Faz 2'ye geç.
 
 Her kural için aşağıdaki alanları soru-cevap ile netleştir. Bağlamdan net çıkanları onay sorusuna dönüştür, çıkmayanları tam sorguya dönüştür.
 
-#### A) Kapsam (Scope) — Hangi dosyaya yazılacak?
+#### A) Kapsam (Scope) — Nereye yazılacak?
 
-**Soru örneği:** "Bu kural hangi uygulamaları kapsıyor?"
+**Eğer `--global` veya `--team` flag'i verilmişse** bu soru atlanır, kapsam bellidir. Flag verilmemişse sor:
 
-**Seçenek kalıpları:** `.claude/docs/coding-standards/` dizinindeki mevcut dosyaları dinamik olarak listele ve seçenek olarak sun:
+**Soru örneği:** "Bu kural nereye yazılsın?"
+
+**Seçenek kalıpları:**
+- Bu projeye özel (`.claude/`) — varsayılan
+- Tüm projelerimde geçerli (`--global` → `~/.claude/rules/`)
+- Team bilgi tabanına (`--team` → agent veya team rule dosyası)
+
+**Proje kapsamı seçilirse takip sorusu:** "Hangi uygulamayı kapsıyor?"
+- `.claude/docs/coding-standards/` dizinindeki mevcut dosyaları dinamik listele
 - Tüm uygulamalar (common) — `coding-common.md`
-- Her mevcut `coding-standards/{app}.md` dosyası için bir seçenek (proje bazında değişir)
+- Her mevcut `coding-standards/{app}.md` dosyası için bir seçenek
 
-**Takip sorusu:** Birden fazla ama hepsi değil seçilirse → "Common'a mı yazalım yoksa ilgili dosyaların her birine ayrı ayrı mı?" (2 seçenek)
+**Team kapsamı seçilirse takip sorusu:** "Hangi agent'ın bilgi tabanına eklensin?"
+- Kurulu team'deki agent dosyalarını listele
+- Veya team geneli rule olarak ekle
 
 #### B) Kuralın Tek Cümlelik İfadesi (Rule)
 

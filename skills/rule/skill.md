@@ -1,14 +1,27 @@
 ---
 name: rule
-description: Yeni bir kodlama/mimari kuralı ekleme. Kullanıcı Türkçe doğal dilde söyler, skill İngilizce yapılandırılmış formatta doğru dosyaya yazar.
-argument-hint: "<Türkçe doğal dilde kural>"
+description: "Yeni bir kodlama/mimari kuralı ekleme. Kullanıcı Türkçe doğal dilde söyler, skill İngilizce yapılandırılmış formatta doğru dosyaya yazar. 3 kapsam: proje (varsayılan), --global, --team."
+argument-hint: "[--global|--team] <Türkçe doğal dilde kural>"
 ---
 
 # /rule Skill
 
-Türkçe ifade edilen bir kuralı analiz edip doğru `coding-standards` veya `coding-common` dosyasına İngilizce yapılandırılmış formatta yazar.
+Türkçe ifade edilen bir kuralı analiz edip doğru dosyaya İngilizce yapılandırılmış formatta yazar.
 
-> Sistem dökümantasyonu: [.claude/docs/coding-rules-system.md](../../docs/coding-rules-system.md)
+---
+
+## Üç Kapsam
+
+| Flag | Hedef | Ne Zaman |
+|------|-------|----------|
+| *(hiçbiri)* | Proje `.claude/` dizini | Bu projeye özel kurallar (varsayılan) |
+| `--global` | `~/.claude/rules/` | Her projede geçerli kişisel kurallar |
+| `--team` | `~/agent-teams/{team}/` dosyaları | Team repo'sundaki agent veya rule dosyaları |
+
+**`--team` aktif team tespiti:**
+- `~/.claude/agents/` altındaki symlink'lerin `readlink` sonucundan `~/agent-teams/{team-name}/` çıkarılır
+- Tek team varsa otomatik kullanılır
+- Birden fazla team varsa AskUserQuestion ile sorulur
 
 ---
 
@@ -22,25 +35,40 @@ Kullanıcının Türkçe ifadesinden şu bilgileri çıkar:
 
 ### 2. Hedef Dosyayı Belirle
 
-Önce projenin `.claude/docs/coding-standards/` dizinine bak ve hangi app-specific dosyaların mevcut olduğunu tespit et. Ardından kapsamı belirle:
+**Proje kapsamında (varsayılan):**
+
+Projenin `.claude/docs/coding-standards/` dizinine bak ve mevcut app dosyalarını tespit et.
 
 | Kapsam | Dosya |
 |--------|-------|
 | Tüm uygulamalar için ortak | `.claude/rules/coding-common.md` |
 | Belirli bir uygulama | `.claude/docs/coding-standards/{app}.md` (mevcut dosyadan seç) |
 
-Her projede farklı app dosyaları olabilir (örn: api.md, flutter.md, app.md, socket.md, worker.md). Dosya listesini dinamik olarak oku.
+**Global kapsamda (`--global`):**
 
-Birden fazla ama hepsi değil → kullanıcıya sor: "common'a mı yazayım yoksa ilgili dosyaların her birine ayrı ayrı mı?"
+| Kapsam | Dosya |
+|--------|-------|
+| Genel kural | `~/.claude/rules/{konu}.md` (mevcut dosya varsa ekle, yoksa oluştur) |
+
+**Team kapsamında (`--team`):**
+
+Kuralın neyi ilgilendirdiğine göre hedef belirlenir:
+
+| İlgili alan | Dosya |
+|------------|-------|
+| Bir agent'ın bilgi tabanı | `~/agent-teams/{team}/agents/{agent}.md` |
+| Team geneli kural | `~/agent-teams/{team}/rules/{konu}.md` |
+
+Birden fazla ama hepsi değil → kullanıcıya sor.
 
 ### 3. Mevcut Kuralları Kontrol Et
-Hedef dosyayı (ve gerekiyorsa diğer ilgili dosyaları) **mutlaka oku**. Üç durum olabilir:
+Hedef dosyayı **mutlaka oku**. Üç durum olabilir:
 - **Tamamen yeni kural:** Yeni bir bölüm olarak ekle
-- **Mevcut kuralı genişletme/güncelleme:** Eski kuralı in-place güncelle, duplikasyon yaratma
+- **Mevcut kuralı genişletme/güncelleme:** In-place güncelle, duplikasyon yaratma
 - **Çakışma:** İki kural birbirine aykırı → kullanıcıya sor, varsayım yapma
 
 ### 4. Yapılandırılmış Formatta Yaz
-İngilizce, **detaylı ve net** — kısa değil. v2 dersi: eksik kural hiç olmayan kuraldan daha tehlikeli.
+İngilizce, **detaylı ve net** — kısa değil. Eksik kural hiç olmayan kuraldan daha tehlikeli.
 
 ```markdown
 ### {kebab-case-rule-id}
@@ -62,22 +90,32 @@ ne tür değişiklikler? Spesifik ol.}
 ```
 
 ### 5. Yazma Kuralları (KRİTİK)
-- **Asla varsayım yapma.** Why, Apply when, Examples bölümlerinden herhangi biri kullanıcının ifadesinden net çıkmıyorsa **sor**. "Şu anlama mı geliyor / örnek olarak X mi olur?" gibi spesifik sor.
-- **Kısa tutma — açıkla.** Şüphe varsa daha çok yaz. Atlanan detay = uygulanmayan kural.
-- **Edge case'leri yakala.** Kuralın geçerli olmadığı durumlar varsa `Don't apply when` ekle.
-- **Örnek vermekten çekinme.** Soyut kural → somut örnek. Hem ✅ hem ❌ ver.
-- **Benzersiz id ver.** `kebab-case`, mevcut id'lerle çakışmamalı (önce dosyayı oku).
+- **Asla varsayım yapma.** Eksik bilgi varsa sor.
+- **Kısa tutma — açıkla.** Atlanan detay = uygulanmayan kural.
+- **Edge case'leri yakala.** `Don't apply when` ekle.
+- **Örnek ver.** Hem ✅ hem ❌.
+- **Benzersiz id ver.** Önce dosyayı oku, çakışma olmasın.
 
 ### 6. Yaz ve Doğrula
-- Hedef dosyayı Edit ile güncelle (yeni kural ekleme veya mevcut kuralı güncelleme).
-- Kullanıcıya **kısa özet** ver: hangi dosyaya, hangi id ile yazıldı, kısa Türkçe açıklama.
+- Hedef dosyayı Edit ile güncelle.
+- Kullanıcıya kısa özet ver: hangi dosyaya, hangi id ile yazıldı.
+
+### 7. Team Kapsamında Git Push
+`--team` ile yazılan kurallarda:
+```bash
+cd ~/agent-teams/{team-name}
+git add -A
+git commit -m "rule: {kebab-case-rule-id}"
+git push
+```
 
 ---
 
 ## Önemli Kurallar
 
-1. **Dil:** Kullanıcı Türkçe söyler, skill İngilizce yazar. Teknik netlik + AI tutarlılığı için.
-2. **Eksik bilgi varsa sor.** Asla doldurma. Her zorunlu alan kullanıcı niyetini yansıtmalı.
+1. **Dil:** Kullanıcı Türkçe söyler, skill İngilizce yazar.
+2. **Eksik bilgi varsa sor.** Asla doldurma.
 3. **Duplikasyon yaratma.** Önce mevcut kuralları oku.
-4. **Dosya yolu doğrula.** Kapsamı yanlış belirlersen kural yanlış dosyaya gider ve hook tetiklenmez.
-5. **Format sapması yok.** Şablondaki tüm zorunlu alanlar dolu olmalı: Rule, Why, Apply when, Examples.
+4. **Dosya yolu doğrula.** Kapsamı yanlış belirlersen kural yanlış dosyaya gider.
+5. **Format sapması yok.** Tüm zorunlu alanlar dolu olmalı: Rule, Why, Apply when, Examples.
+6. **Team kapsamında otomatik git push.** Kural yazıldıktan sonra commit + push.
