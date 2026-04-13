@@ -1,23 +1,23 @@
-# Agent Yapılandırma Kuralları
+# Agent Configuration Rules
 
-## Children Pattern (Zorunlu)
+## Children Pattern (Mandatory)
 
-Her agent şu yapıda organize edilir:
+Every agent is organized in the following structure:
 
 ```
 ~/.claude/agents/{agent-name}/
-├── agent.md              ← Kimlik, sorumluluk alanı, temel prensipler (kısa, gömülü)
-└── children/             ← Detaylı bilgi, pattern'ler, stratejiler (her konu ayrı dosya)
+├── agent.md              ← Identity, area of responsibility, core principles (short, embedded)
+└── children/             ← Detailed information, patterns, strategies (each topic in a separate file)
     ├── konu-1.md
     ├── konu-2.md
     └── ...
 ```
 
-### Kurallar
+### Rules
 
-1. **agent.md kısa kalır.** Sadece: kimlik, sorumluluk alanı (pozitif liste), temel prensipler (değişmeyen, kısa maddeler), "children/ oku" talimatı.
-2. **Detaylı her şey children/ altında.** Stratejiler, pattern'ler, workflow'lar, convention'lar — her biri ayrı .md dosyası.
-3. **Yeni konu = yeni dosya.** agent.md'ye dokunmadan children/ altına .md at. Agent "children/ altındaki tüm .md dosyalarını oku" talimatıyla otomatik keşfeder.
-4. **Güncelleme = tek dosya.** Bir konuyu güncellemek için sadece ilgili children dosyasına dokunulur.
-5. **Monolitik agent dosyası yasak.** Tüm bilgiyi tek .md'ye yığmak yasak — yönetilemez hale gelir.
-6. **Bu pattern tüm agent'lar için geçerlidir.** API, Socket, Worker, Flutter, React, Mail, Log, Infra — hepsi aynı yapıda.
+1. **agent.md stays short.** Only: identity, area of responsibility (positive list), core principles (unchanging, short bullet points), "read children/" instruction.
+2. **Everything detailed goes under children/.** Strategies, patterns, workflows, conventions -- each in a separate .md file.
+3. **New topic = new file.** Without touching agent.md, add a .md file under children/. The agent auto-discovers it via the "read all .md files under children/" instruction.
+4. **Update = single file.** To update a topic, only the relevant children file is touched.
+5. **Monolithic agent files are prohibited.** Piling all information into a single .md is prohibited -- it becomes unmanageable.
+6. **This pattern applies to all agents.** API, Socket, Worker, Flutter, React, Mail, Log, Infra -- all follow the same structure.

@@ -1,107 +1,107 @@
 ---
 name: rule
-description: "Yeni bir kodlama/mimari kuralı ekleme. Kullanıcı Türkçe doğal dilde söyler, skill İngilizce yapılandırılmış formatta doğru dosyaya yazar. 3 kapsam: proje (varsayılan), --global, --team."
-argument-hint: "[--global|--team] <Türkçe doğal dilde kural>"
+description: "Add a new coding/architecture rule. The user describes it in Turkish natural language, the skill writes it in English structured format to the correct file. 3 scopes: project (default), --global, --team."
+argument-hint: "[--global|--team] <rule in Turkish natural language>"
 ---
 
 # /rule Skill
 
-Türkçe ifade edilen bir kuralı analiz edip doğru dosyaya İngilizce yapılandırılmış formatta yazar.
+Analyzes a rule expressed in Turkish and writes it to the correct file in English structured format.
 
 ---
 
-## Üç Kapsam
+## Three Scopes
 
-| Flag | Hedef | Ne Zaman |
-|------|-------|----------|
-| *(hiçbiri)* | Proje `.claude/` dizini | Bu projeye özel kurallar (varsayılan) |
-| `--global` | `~/.claude/rules/` | Her projede geçerli kişisel kurallar |
-| `--team` | `~/agent-teams/{team}/` dosyaları | Team repo'sundaki agent veya rule dosyaları |
+| Flag | Target | When |
+|------|--------|------|
+| *(none)* | Project `.claude/` directory | Rules specific to this project (default) |
+| `--global` | `~/.claude/rules/` | Personal rules that apply to every project |
+| `--team` | `~/agent-teams/{team}/` files | Agent or rule files in the team repo |
 
-**`--team` aktif team tespiti:**
-- `~/.claude/agents/` altındaki symlink'lerin `readlink` sonucundan `~/agent-teams/{team-name}/` çıkarılır
-- Tek team varsa otomatik kullanılır
-- Birden fazla team varsa AskUserQuestion ile sorulur
+**`--team` active team detection:**
+- The `readlink` result of symlinks under `~/.claude/agents/` is used to extract `~/agent-teams/{team-name}/`
+- If there is only one team, it is used automatically
+- If there are multiple teams, the user is asked via AskUserQuestion
 
 ---
 
-## Akış
+## Flow
 
-### 1. Kuralı Analiz Et
-Kullanıcının Türkçe ifadesinden şu bilgileri çıkar:
-- **Konu:** Hangi tür kural? (kodlama, mimari, naming, error handling, vb.)
-- **Kapsam:** Hangi uygulama(lar)ı etkiliyor?
-- **Motivasyon:** Neden bu kural? (Açıkça söylenmemişse mantıklı bir Why çıkar — emin değilsen sor.)
+### 1. Analyze the Rule
+Extract the following from the user's Turkish expression:
+- **Topic:** What type of rule? (coding, architecture, naming, error handling, etc.)
+- **Scope:** Which application(s) does it affect?
+- **Motivation:** Why this rule? (If not explicitly stated, derive a reasonable Why -- if unsure, ask.)
 
-### 2. Hedef Dosyayı Belirle
+### 2. Determine the Target File
 
-**Proje kapsamında (varsayılan):**
+**Project scope (default):**
 
-Projenin `.claude/docs/coding-standards/` dizinine bak ve mevcut app dosyalarını tespit et.
+Look at the project's `.claude/docs/coding-standards/` directory and identify existing app files.
 
-| Kapsam | Dosya |
-|--------|-------|
-| Tüm uygulamalar için ortak | `.claude/rules/coding-common.md` |
-| Belirli bir uygulama | `.claude/docs/coding-standards/{app}.md` (mevcut dosyadan seç) |
+| Scope | File |
+|-------|------|
+| Common to all applications | `.claude/rules/coding-common.md` |
+| A specific application | `.claude/docs/coding-standards/{app}.md` (select from existing files) |
 
-**Global kapsamda (`--global`):**
+**Global scope (`--global`):**
 
-| Kapsam | Dosya |
-|--------|-------|
-| Genel kural | `~/.claude/rules/{konu}.md` (mevcut dosya varsa ekle, yoksa oluştur) |
+| Scope | File |
+|-------|------|
+| General rule | `~/.claude/rules/{topic}.md` (append to existing file, or create if none exists) |
 
-**Team kapsamında (`--team`):**
+**Team scope (`--team`):**
 
-Kuralın neyi ilgilendirdiğine göre hedef belirlenir:
+The target is determined based on what the rule pertains to:
 
-| İlgili alan | Dosya |
-|------------|-------|
-| Bir agent'ın bilgi tabanı | `~/agent-teams/{team}/agents/{agent}.md` |
-| Team geneli kural | `~/agent-teams/{team}/rules/{konu}.md` |
+| Related area | File |
+|-------------|------|
+| An agent's knowledge base | `~/agent-teams/{team}/agents/{agent}.md` |
+| Team-wide rule | `~/agent-teams/{team}/rules/{topic}.md` |
 
-Birden fazla ama hepsi değil → kullanıcıya sor.
+If it applies to more than one but not all, ask the user.
 
-### 3. Mevcut Kuralları Kontrol Et
-Hedef dosyayı **mutlaka oku**. Üç durum olabilir:
-- **Tamamen yeni kural:** Yeni bir bölüm olarak ekle
-- **Mevcut kuralı genişletme/güncelleme:** In-place güncelle, duplikasyon yaratma
-- **Çakışma:** İki kural birbirine aykırı → kullanıcıya sor, varsayım yapma
+### 3. Check Existing Rules
+**Always read** the target file. Three situations are possible:
+- **Entirely new rule:** Add as a new section
+- **Extending/updating an existing rule:** Update in-place, do not create duplication
+- **Conflict:** Two rules contradict each other -- ask the user, do not assume
 
-### 4. Yapılandırılmış Formatta Yaz
-İngilizce, **detaylı ve net** — kısa değil. Eksik kural hiç olmayan kuraldan daha tehlikeli.
+### 4. Write in Structured Format
+In English, **detailed and clear** -- not brief. An incomplete rule is more dangerous than no rule at all.
 
 ```markdown
 ### {kebab-case-rule-id}
-**Rule:** {Tek cümlede kuralın net ifadesi}
+**Rule:** {Clear statement of the rule in a single sentence}
 
-**Why:** {Motivasyon. Hangi sorunu önlüyor? Hangi prensibi destekliyor?
-Varsa geçmiş hatadan ders. Bu alan boş veya muğlak bırakılmaz.}
+**Why:** {Motivation. What problem does it prevent? What principle does it support?
+Include lessons from past mistakes if applicable. This field must not be left empty or vague.}
 
-**Apply when:** {Hangi durumlarda geçerli — dosya yolları, kod desenleri,
-ne tür değişiklikler? Spesifik ol.}
+**Apply when:** {Under what circumstances does it apply -- file paths, code patterns,
+what types of changes? Be specific.}
 
-**Don't apply when:** {(Opsiyonel) İstisnalar varsa açıkça yaz.}
+**Don't apply when:** {(Optional) Explicitly state exceptions if any.}
 
 **Examples:**
-- ✅ Correct: {kod örneği veya somut senaryo}
-- ❌ Wrong: {kod örneği veya somut senaryo}
+- ✅ Correct: {code example or concrete scenario}
+- ❌ Wrong: {code example or concrete scenario}
 
-**Related:** {(Opsiyonel) İlgili kural id'leri}
+**Related:** {(Optional) Related rule IDs}
 ```
 
-### 5. Yazma Kuralları (KRİTİK)
-- **Asla varsayım yapma.** Eksik bilgi varsa sor.
-- **Kısa tutma — açıkla.** Atlanan detay = uygulanmayan kural.
-- **Edge case'leri yakala.** `Don't apply when` ekle.
-- **Örnek ver.** Hem ✅ hem ❌.
-- **Benzersiz id ver.** Önce dosyayı oku, çakışma olmasın.
+### 5. Writing Rules (CRITICAL)
+- **Never assume.** If information is missing, ask.
+- **Do not keep it short -- explain.** Skipped detail = unenforced rule.
+- **Capture edge cases.** Add `Don't apply when`.
+- **Provide examples.** Both ✅ and ❌.
+- **Assign a unique ID.** Read the file first to avoid conflicts.
 
-### 6. Yaz ve Doğrula
-- Hedef dosyayı Edit ile güncelle.
-- Kullanıcıya kısa özet ver: hangi dosyaya, hangi id ile yazıldı.
+### 6. Write and Verify
+- Update the target file with Edit.
+- Give the user a brief summary: which file and which ID it was written to.
 
-### 7. Team Kapsamında Git Push
-`--team` ile yazılan kurallarda:
+### 7. Git Push for Team Scope
+For rules written with `--team`:
 ```bash
 cd ~/agent-teams/{team-name}
 git add -A
@@ -111,11 +111,11 @@ git push
 
 ---
 
-## Önemli Kurallar
+## Important Rules
 
-1. **Dil:** Kullanıcı Türkçe söyler, skill İngilizce yazar.
-2. **Eksik bilgi varsa sor.** Asla doldurma.
-3. **Duplikasyon yaratma.** Önce mevcut kuralları oku.
-4. **Dosya yolu doğrula.** Kapsamı yanlış belirlersen kural yanlış dosyaya gider.
-5. **Format sapması yok.** Tüm zorunlu alanlar dolu olmalı: Rule, Why, Apply when, Examples.
-6. **Team kapsamında otomatik git push.** Kural yazıldıktan sonra commit + push.
+1. **Language:** The user speaks Turkish, the skill writes in English.
+2. **Ask if information is missing.** Never fill in gaps on your own.
+3. **Do not create duplication.** Read existing rules first.
+4. **Validate file paths.** If you determine the scope incorrectly, the rule goes to the wrong file.
+5. **No format deviations.** All required fields must be filled: Rule, Why, Apply when, Examples.
+6. **Automatic git push for team scope.** Commit + push after the rule is written.
