@@ -1,7 +1,7 @@
 ---
 name: rule-wizard
 description: "A clarification wizard that uses option-based Q&A rounds before adding a rule. Captures missing details from context, presents alternatives as options, dynamically detects multiple rules, and finally adds the finalized rule(s) via /rule. 3 scopes: project, --global, --team."
-argument-hint: "[--global|--team] <Turkish context -- general topic of the rule>"
+argument-hint: "[--global|--team] <context — general topic of the rule, any language>"
 ---
 
 # /rule-wizard Skill
@@ -15,16 +15,16 @@ A wizard that surfaces details easily overlooked when writing a rule directly wi
 
 ## Parameter Requirement
 
-The skill is always invoked with a **context** argument. The context is a short Turkish text describing the general topic of the rule, the initial draft idea, or the problem encountered.
+The skill is always invoked with a **context** argument. The context is a short text (any language) describing the general topic of the rule, the initial draft idea, or the problem encountered.
 
-- ✅ `/rule-wizard API'de logging kullanımı`
-- ✅ `/rule-wizard Worker doğrudan DB'ye bağlanmasın`
-- ✅ `/rule-wizard Controller'larda try-catch yazılmasın, global handler üstlensin`
+- ✅ `/rule-wizard Logging usage in API`
+- ✅ `/rule-wizard Worker should not connect to DB directly`
+- ✅ `/rule-wizard Controllers should not write try-catch; global handler takes over`
 - ❌ `/rule-wizard` (invoked without context)
 
 **If no context is provided:** Do not proceed with the flow. Ask the user concisely and clearly for context:
 
-> "This skill requires an initial context. Please briefly describe the general topic or initial idea for the rule: `/rule-wizard <topic of the rule>`. Example: `/rule-wizard Worker Jobs'ların hata yönetimi`."
+> "This skill requires an initial context. Please briefly describe the general topic or initial idea for the rule: `/rule-wizard <topic of the rule>`. Example: `/rule-wizard Error handling for Worker Jobs`."
 
 Do not read any files or ask any questions until the user responds.
 
@@ -73,7 +73,7 @@ Then proceed to Phase 2.
 2. **Each question has 2-4 options.** Platform limit is 4. If there are more reasonable options, split the question; never limit yourself to "the best 4."
 3. **An "Other" option is automatically added.** The user can enter free text; do not explicitly write this as an option -- the tool adds it itself.
 4. **If there is a recommended option, place it first** and add `(Recommended)` to its label. Briefly explain why you recommend it in the option's `description` field.
-5. **Ask in Turkish, present options in Turkish.** `/rule` will translate to English at the final step -- this skill always communicates in Turkish and produces Turkish output.
+5. **Match the user's language for questions and options.** `/rule` will translate to English at the final step — this skill mirrors whichever language the user invoked it in.
 6. **Maximum 4 questions per round.** If more than 4 questions are needed, split into rounds -- answers from the first round can feed into the second.
 7. **Do not re-ask about fields that are clearly derived from context.** Instead, ask a confirmation question: "I understood it as X -- is that correct?" (binary option: Correct / No, I want to change it).
 8. **Options must be distinct and clear.** If two options are nearly the same, remove one. Options should be collectively exhaustive -- if an "all of the above" situation exists, present it with `multiSelect: true`.
@@ -216,9 +216,9 @@ When any signal is triggered, ask the following using AskUserQuestion:
 
 ## Phase 4 -- Consolidation and Final Approval
 
-### 4.1 Generate the Turkish Rule Text
+### 4.1 Generate the Final Rule Text
 
-Once questioning is complete, compose a **Turkish natural language** rule text from the collected answers that will serve as the **input for the /rule skill**.
+Once questioning is complete, compose a **natural language** rule text in the user's language (matches the language they used in the wizard) from the collected answers that will serve as the **input for the /rule skill**.
 
 This text should contain all the information that the `/rule` skill will parse:
 - **Scope** (it should be clear which file it will go to)
@@ -231,13 +231,13 @@ This text should contain all the information that the `/rule` skill will parse:
 
 **Example final text:**
 
-> "API projesindeki controller aksiyonlarında try-catch bloğu yazılmasın -- hata yönetimi üst katmandaki global exception handler'a bırakılsın. Bu kural mimari tutarlılığı korumak ve controller'ları gerçekten ince köprüler olarak tutmak için var; try-catch servis veya global handler'ın sorumluluğudur. Uygulanacağı yerler: `api/Controllers/` altındaki tüm `.cs` dosyalarındaki controller aksiyonları. Test kodu istisna sayılır. Doğru örnek: `[HttpPost] public async Task<IActionResult> Create(CreateProductRequest req) { var result = await _productService.CreateAsync(req); return Ok(result); }` -- hiçbir try-catch yok. Yanlış örnek: controller içinde `try { ... } catch (Exception ex) { return BadRequest(ex.Message); }` yazmak. İlgili kural: `no-logic-in-bridges`."
+> "Controller actions in the API project should not write try-catch blocks — error handling must be delegated to the global exception handler at the upper layer. This rule exists to preserve architectural consistency and to keep controllers as thin bridges; try-catch is the responsibility of services or the global handler. Applies to: all controller actions in `.cs` files under `api/Controllers/`. Test code is exempt. Correct example: `[HttpPost] public async Task<IActionResult> Create(CreateProductRequest req) { var result = await _productService.CreateAsync(req); return Ok(result); }` — no try-catch. Wrong example: writing `try { ... } catch (Exception ex) { return BadRequest(ex.Message); }` inside a controller. Related rule: `no-logic-in-bridges`."
 
-This text can be a single paragraph or split into two-three sentences if needed -- but it is not converted to compressed `Rule:` format; the `/rule` skill will do its own parsing.
+This text can be a single paragraph or split into two-three sentences if needed — but it is not converted to compressed `Rule:` format; the `/rule` skill will do its own parsing.
 
 ### 4.2 Show to User and Get Approval
 
-Show the generated Turkish text to the user and ask the following approval question via AskUserQuestion:
+Show the generated final-rule text to the user and ask the following approval question via AskUserQuestion:
 
 **Question:** "Is this text the final version of the rule? Can I add it now with `/rule`?"
 
@@ -251,7 +251,7 @@ Show the generated Turkish text to the user and ask the following approval quest
 
 When the user selects "Yes, add":
 
-- **If there is a single rule:** Invoke `/rule <Turkish final text>`.
+- **If there is a single rule:** Invoke `/rule <final text>`.
 - **If there are multiple rules:** Invoke each one **sequentially**. Give the user a brief progress notification between them:
   - "First rule written (`{id}` -- `{file}`). Moving to the second rule now."
 - **After each `/rule` invocation**, relay the result to the user as a summary.
@@ -281,7 +281,7 @@ When the writing phase is complete, give the user a single summary message:
 4. **Read existing rules first.** A mandatory prerequisite to catch duplication and conflicts early.
 5. **Never assume.** Every field not clearly derived from context requires a question. Even if it is a confirmation question, it must be asked.
 6. **Dynamically detect multiple rules.** Start with a single-rule assumption but ask the user when a divergence signal appears.
-7. **Final text is in Turkish.** The `/rule` skill will translate to English -- this skill always communicates and produces output in Turkish.
+7. **Final text is in the user's language.** The `/rule` skill will translate to English — this skill mirrors whichever language the user used in the wizard.
 8. **`/rule` is not invoked without approval.** The finalized text is shown to the user and approval is obtained before proceeding to the writing phase.
 9. **An incomplete field is worse than a nonexistent field.** The required fields of the rule format (Rule, Why, Apply when, Examples) must be fully represented in the final text.
 10. **The skill can be run repeatedly for multiple rules.** If dynamic split mode was selected in Phase 3, each rule goes through the Phase 2-4 cycle individually.

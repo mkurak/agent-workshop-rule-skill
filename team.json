@@ -1,28 +1,39 @@
 {
-  "schemaVersion": 1,
-  "name": "rule",
-  "version": "1.0.0",
-  "description": "Coding & architecture rule management with guided wizard. 3 scopes: project, global, team.",
-  "author": {
-    "name": "AgentTeamLand",
-    "url": "https://github.com/agentteamland"
-  },
-  "license": "MIT",
-  "keywords": ["rules", "coding-standards", "architecture", "wizard"],
-  "repository": "https://github.com/agentteamland/rule",
-  "homepage": "https://github.com/agentteamland",
-  "agents": [],
-  "skills": [
-    { "name": "rule", "description": "/rule — add a coding/architecture rule; Turkish natural-language input, English structured output" },
-    { "name": "rule-wizard", "description": "/rule-wizard — clarification wizard with option-based Q&A rounds before adding a rule" }
-  ],
-  "rules": [],
-  "extends": null,
-  "excludes": [],
-  "dependencies": {
-    "core": "^1.0.0"
-  },
-  "requires": {
-    "atl": ">=0.1.0"
-  }
+    "schemaVersion": 1,
+    "name": "rule",
+    "version": "1.0.1",
+    "description": "Coding & architecture rule management with guided wizard. 3 scopes: project, global, team.",
+    "author": {
+        "name": "AgentTeamLand",
+        "url": "https://github.com/agentteamland"
+    },
+    "license": "MIT",
+    "keywords": [
+        "rules",
+        "coding-standards",
+        "architecture",
+        "wizard"
+    ],
+    "repository": "https://github.com/agentteamland/rule",
+    "homepage": "https://github.com/agentteamland",
+    "agents": [],
+    "skills": [
+        {
+            "name": "rule",
+            "description": "/rule \u2014 add a coding/architecture rule; Turkish natural-language input, English structured output"
+        },
+        {
+            "name": "rule-wizard",
+            "description": "/rule-wizard \u2014 clarification wizard with option-based Q&A rounds before adding a rule"
+        }
+    ],
+    "rules": [],
+    "extends": null,
+    "excludes": [],
+    "dependencies": {
+        "core": "^1.0.0"
+    },
+    "requires": {
+        "atl": ">=0.1.0"
+    }
 }

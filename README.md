@@ -14,8 +14,8 @@ Claude Code skills for managing coding rules and standards. Write rules in natur
 
 ### Quick Rule Addition
 ```bash
-# Describe a rule in natural language (Turkish or English)
-/rule API endpoint'lerinde try-catch yazılmasın, global handler üstlensin
+# Describe a rule in natural language (any language — output is always English)
+/rule API controllers should not write try-catch; global handler takes over
 ```
 
 The skill analyzes your input, determines the correct file, checks for duplicates, and writes a structured rule in English.
@@ -23,7 +23,7 @@ The skill analyzes your input, determines the correct file, checks for duplicate
 ### Guided Wizard (for complex rules)
 ```bash
 # Multi-turn Q&A to refine a rule before writing
-/rule-wizard Controller'larda logging kullanımı
+/rule-wizard Logging usage in controllers
 ```
 
 The wizard asks multiple-choice questions to clarify scope, motivation, examples, and edge cases before generating the final rule.
@@ -70,7 +70,7 @@ The `/rule` skill automatically determines which file to write to based on the r
 
 ## Key Features
 
-- **Natural language input** — describe rules in Turkish, skill writes in English
+- **Natural language input** — describe rules in any language, skill writes in English
 - **Duplicate detection** — reads existing rules before writing
 - **Conflict detection** — warns if new rule contradicts an existing one
 - **Dynamic scope** — scans `coding-standards/` directory to discover available apps
