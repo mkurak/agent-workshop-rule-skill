@@ -1,12 +1,12 @@
 ---
 name: rule
-description: "Add a new coding/architecture rule. The user describes it in Turkish natural language, the skill writes it in English structured format to the correct file. 3 scopes: project (default), --global, --team."
-argument-hint: "[--global|--team] <rule in Turkish natural language>"
+description: "Add a new coding/architecture rule. The user describes it in natural language (any language), the skill writes it in English structured format to the correct file. 3 scopes: project (default), --global, --team."
+argument-hint: "[--global|--team] <rule in natural language, any language>"
 ---
 
 # /rule Skill
 
-Analyzes a rule expressed in Turkish and writes it to the correct file in English structured format.
+Analyzes a rule expressed in natural language (any language) and writes it to the correct file in English structured format.
 
 ---
 
@@ -28,7 +28,7 @@ Analyzes a rule expressed in Turkish and writes it to the correct file in Englis
 ## Flow
 
 ### 1. Analyze the Rule
-Extract the following from the user's Turkish expression:
+Extract the following from the user's natural-language expression:
 - **Topic:** What type of rule? (coding, architecture, naming, error handling, etc.)
 - **Scope:** Which application(s) does it affect?
 - **Motivation:** Why this rule? (If not explicitly stated, derive a reasonable Why -- if unsure, ask.)
@@ -113,7 +113,7 @@ git push
 
 ## Important Rules
 
-1. **Language:** The user speaks Turkish, the skill writes in English.
+1. **Language:** The user may invoke the skill in any language; the skill always writes the rule in English.
 2. **Ask if information is missing.** Never fill in gaps on your own.
 3. **Do not create duplication.** Read existing rules first.
 4. **Validate file paths.** If you determine the scope incorrectly, the rule goes to the wrong file.
