@@ -5,10 +5,10 @@ Claude Code skills for managing coding rules and standards. Write rules in natur
 ## Installation
 
 ```bash
-/team install https://github.com/agentteamland/rule.git
+atl install rule
 ```
 
-> Requires [Agent Team Manager](https://github.com/agentteamland/team-manager) to be installed first.
+> Requires the [`atl` CLI](https://github.com/agentteamland/cli) to be installed first.
 
 ## Usage
 
@@ -34,7 +34,8 @@ The wizard asks multiple-choice questions to clarify scope, motivation, examples
 |------|------|---------|
 | Skill | `skills/rule/skill.md` | The `/rule` command — direct rule writing |
 | Skill | `skills/rule-wizard/skill.md` | The `/rule-wizard` command — guided Q&A |
-| Rule | `rules/agent-structure.md` | Agent organization standard (children pattern) |
+
+> Note: `agent-structure.md` rule (cross-team agent + skill structure) ships in [`agentteamland/core`](https://github.com/agentteamland/core), not here.
 
 ## Rule Format
 
