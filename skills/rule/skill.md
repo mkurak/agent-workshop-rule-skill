@@ -100,14 +100,19 @@ what types of changes? Be specific.}
 - Update the target file with Edit.
 - Give the user a brief summary: which file and which ID it was written to.
 
-### 7. Git Push for Team Scope
-For rules written with `--team`:
+### 7. Persisting Team-Scope Rules
+For rules written with `--team`, the rule file lives under the team's local clone. Every public `agentteamland/{team}` repo is branch-protected, so direct push to `origin/main` is refused. Open a PR instead:
+
 ```bash
 cd ~/.claude/repos/agentteamland/{team-name}
-git add -A
+git checkout -b rule/{kebab-case-rule-id}
+git add rules/{file}.md team.json
 git commit -m "rule: {kebab-case-rule-id}"
-git push
+git push -u origin rule/{kebab-case-rule-id}
+gh pr create --fill
 ```
+
+The `/create-pr` skill in `core` automates this if installed.
 
 ---
 
@@ -118,4 +123,8 @@ git push
 3. **Do not create duplication.** Read existing rules first.
 4. **Validate file paths.** If you determine the scope incorrectly, the rule goes to the wrong file.
 5. **No format deviations.** All required fields must be filled: Rule, Why, Apply when, Examples.
-6. **Automatic git push for team scope.** Commit + push after the rule is written.
+6. **Team-scope rules ship via PR, not direct push.** Every public `agentteamland/{team}` repo is branch-protected; the skill writes the rule file to the team's local clone and instructs the user to open a PR (or use `/create-pr`).
+
+## Accumulated Learnings
+
+(Auto-rebuilt by /save-learnings from learnings/*.md frontmatter. Do not edit by hand. Currently empty — populates as the skill is used and edge-case learnings accumulate.)

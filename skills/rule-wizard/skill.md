@@ -285,3 +285,7 @@ When the writing phase is complete, give the user a single summary message:
 8. **`/rule` is not invoked without approval.** The finalized text is shown to the user and approval is obtained before proceeding to the writing phase.
 9. **An incomplete field is worse than a nonexistent field.** The required fields of the rule format (Rule, Why, Apply when, Examples) must be fully represented in the final text.
 10. **The skill can be run repeatedly for multiple rules.** If dynamic split mode was selected in Phase 3, each rule goes through the Phase 2-4 cycle individually.
+
+## Accumulated Learnings
+
+(Auto-rebuilt by /save-learnings from learnings/*.md frontmatter. Do not edit by hand. Currently empty — populates as the skill is used and edge-case learnings accumulate.)

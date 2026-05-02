@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "name": "rule",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Coding & architecture rule management with guided wizard. 3 scopes: project, global, team.",
     "author": {
         "name": "AgentTeamLand",
@@ -20,7 +20,7 @@
     "skills": [
         {
             "name": "rule",
-            "description": "/rule \u2014 add a coding/architecture rule; Turkish natural-language input, English structured output"
+            "description": "/rule \u2014 add a coding/architecture rule; any-language natural input, English structured output"
         },
         {
             "name": "rule-wizard",
