@@ -28,6 +28,26 @@ The skill analyzes your input, determines the correct file, checks for duplicate
 
 The wizard asks multiple-choice questions to clarify scope, motivation, examples, and edge cases before generating the final rule.
 
+### Three scopes — `--global` and `--team` extend beyond the current project
+
+Both `/rule` and `/rule-wizard` accept an optional scope flag:
+
+| Flag | Target | When |
+|---|---|---|
+| *(none)* | The current project's `.claude/` files | Project-specific rules (default) |
+| `--global` | `~/.claude/rules/{topic}.md` | Personal rules that apply to every project |
+| `--team` | `~/.claude/repos/agentteamland/{team}/` agent or rule files | Rules contributed back to a team repo (ships via PR per the team-repo-maintenance discipline) |
+
+```bash
+# Personal global rule that applies to every project
+/rule --global Always run prettier on .ts and .tsx files before committing
+
+# Team-scope rule (asked which agent's knowledge base to add to, or as a team-wide rule)
+/rule-wizard --team Worker should never connect to DB directly
+```
+
+For `--team`, active team is auto-detected from installed `.claude/agents/` symlinks. Single team → used automatically; multiple teams → asked via `AskUserQuestion`. Team-scope rules are written to the team's local clone and require a PR to land — the skill instructs you on the PR command (or use [`/create-pr`](https://github.com/agentteamland/core/blob/main/skills/create-pr/skill.md) for the automated path).
+
 ## What's Included
 
 | Type | File | Purpose |
@@ -60,14 +80,31 @@ Every rule follows a structured template:
 
 ## How Rules Are Organized
 
-Rules live in two locations per project:
+Per-scope file resolution. The `/rule` skill automatically determines which file to write to.
 
-| Scope | Location | When Loaded |
+### Project scope (default — no flag)
+
+Two locations inside the current project:
+
+| Sub-scope | Location | When Loaded |
 |-------|----------|-------------|
 | Cross-cutting | `.claude/rules/coding-common.md` | Always (every conversation) |
 | App-specific | `.claude/docs/coding-standards/{app}.md` | Auto-injected when editing files in that app directory |
 
-The `/rule` skill automatically determines which file to write to based on the rule's scope.
+### Global scope (`--global`)
+
+| Sub-scope | Location | When Loaded |
+|---|---|---|
+| Personal cross-project rule | `~/.claude/rules/{topic}.md` | Always (every conversation across every project) |
+
+### Team scope (`--team`)
+
+| Sub-scope | Location | When Loaded |
+|---|---|---|
+| Agent-specific knowledge | `~/.claude/repos/agentteamland/{team}/agents/{agent}.md` | When that agent is invoked in any project that has the team installed |
+| Team-wide rule | `~/.claude/repos/agentteamland/{team}/rules/{topic}.md` | Always for any project with the team installed |
+
+Team-scope writes go to the team's local clone first; landing them upstream requires a PR (see the [team-repo-maintenance rule](https://github.com/agentteamland/core/blob/main/rules/team-repo-maintenance.md)).
 
 ## Key Features
 
