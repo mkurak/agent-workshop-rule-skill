@@ -37,12 +37,12 @@ Extract the following from the user's natural-language expression:
 
 **Project scope (default):**
 
-Look at the project's `.claude/docs/coding-standards/` directory and identify existing app files.
+Look at the project's `.atl/docs/coding-standards/` directory and identify existing app files.
 
 | Scope | File |
 |-------|------|
 | Common to all applications | `.claude/rules/coding-common.md` |
-| A specific application | `.claude/docs/coding-standards/{app}.md` (select from existing files) |
+| A specific application | `.atl/docs/coding-standards/{app}.md` (select from existing files) |
 
 **Global scope (`--global`):**
 

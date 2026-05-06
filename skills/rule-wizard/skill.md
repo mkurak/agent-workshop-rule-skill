@@ -9,7 +9,7 @@ argument-hint: "[--global|--team] <context — general topic of the rule, any la
 A wizard that surfaces details easily overlooked when writing a rule directly with `/rule` (edge cases, exceptions, alternative formulations, scope, motivation, example variants) through **option-based Q&A rounds**. Once the discussion is complete, it passes the finalized rule(s) to the `/rule` skill to write them to the file.
 
 > Related skill: [/rule](../rule/skill.md) -- The rule writer invoked at the end of this skill.
-> System documentation: [.claude/docs/coding-rules-system.md](../../docs/coding-rules-system.md)
+> System documentation: [.atl/docs/coding-rules-system.md](../../docs/coding-rules-system.md)
 
 ---
 
@@ -37,7 +37,7 @@ Do not read any files or ask any questions until the user responds.
 **Before** starting the questioning, always read the following files:
 
 - `.claude/rules/coding-common.md`
-- **All .md files** in the `.claude/docs/coding-standards/` directory (these may differ per project -- dynamically list and read them)
+- **All .md files** in the `.atl/docs/coding-standards/` directory (these may differ per project -- dynamically list and read them)
 
 Purpose:
 - **Duplication prevention:** Does the same or a very similar rule already exist?
@@ -94,7 +94,7 @@ Clarify the following areas for each rule through Q&A. Convert fields that are c
 - Team knowledge base (`--team` -> agent or team rule file)
 
 **Follow-up question if project scope is selected:** "Which application does it cover?"
-- Dynamically list existing files in `.claude/docs/coding-standards/`
+- Dynamically list existing files in `.atl/docs/coding-standards/`
 - All applications (common) -- `coding-common.md`
 - One option for each existing `coding-standards/{app}.md` file
 
