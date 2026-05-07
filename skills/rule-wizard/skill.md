@@ -9,7 +9,6 @@ argument-hint: "[--global|--team] <context — general topic of the rule, any la
 A wizard that surfaces details easily overlooked when writing a rule directly with `/rule` (edge cases, exceptions, alternative formulations, scope, motivation, example variants) through **option-based Q&A rounds**. Once the discussion is complete, it passes the finalized rule(s) to the `/rule` skill to write them to the file.
 
 > Related skill: [/rule](../rule/skill.md) -- The rule writer invoked at the end of this skill.
-> System documentation: [.atl/docs/coding-rules-system.md](../../docs/coding-rules-system.md)
 
 ---
 
